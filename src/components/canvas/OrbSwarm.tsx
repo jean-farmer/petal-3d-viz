@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { Physics, RigidBody, BallCollider, CuboidCollider } from '@react-three/rapier'
 import { useControls } from 'leva'
-import { useAudioStore } from '../../stores/audioStore'
+import { audioBands } from '../../stores/audioStore'
 import * as THREE from 'three'
 
 const sphereGeometry = new THREE.SphereGeometry(1, 64, 64)
@@ -35,7 +35,7 @@ function Orb({ scale }: { scale: number }) {
     if (!api.current) return
     const d = Math.min(0.1, delta)
     const pos = api.current.translation()
-    const { bass } = useAudioStore.getState()
+    const bass = audioBands.bass
 
     // Gentle gravity toward center
     vec.current.set(pos.x, pos.y, pos.z)

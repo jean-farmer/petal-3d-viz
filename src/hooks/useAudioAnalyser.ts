@@ -1,5 +1,5 @@
 import { useRef, useCallback, useEffect } from 'react'
-import { useAudioStore } from '../stores/audioStore'
+import { useAudioStore, audioBands } from '../stores/audioStore'
 import { extractBands, smoothBands, type AudioBands } from '../lib/audioUtils'
 
 export function useAudioAnalyser() {
@@ -10,7 +10,7 @@ export function useAudioAnalyser() {
   const rafRef = useRef<number>(0)
   const prevBands = useRef<AudioBands>({ bass: 0, mids: 0, highs: 0 })
 
-  const { setBands, setPlaying, setPaused, setSource } = useAudioStore.getState()
+  const { setPlaying, setPaused, setSource } = useAudioStore.getState()
 
   const tick = useCallback(() => {
     if (!analyserRef.current) return
@@ -19,9 +19,11 @@ export function useAudioAnalyser() {
     const raw = extractBands(dataArray)
     const smoothed = smoothBands(prevBands.current, raw, 0.75)
     prevBands.current = smoothed
-    setBands(smoothed.bass, smoothed.mids, smoothed.highs)
+    audioBands.bass = smoothed.bass
+    audioBands.mids = smoothed.mids
+    audioBands.highs = smoothed.highs
     rafRef.current = requestAnimationFrame(tick)
-  }, [setBands])
+  }, [])
 
   function ensureContext() {
     if (!ctxRef.current) {
@@ -66,7 +68,7 @@ export function useAudioAnalyser() {
     audio.addEventListener('ended', () => {
       setPlaying(false)
       cancelAnimationFrame(rafRef.current)
-      setBands(0, 0, 0)
+      audioBands.bass = audioBands.mids = audioBands.highs = 0
     })
   }
 
@@ -76,7 +78,7 @@ export function useAudioAnalyser() {
     audio.crossOrigin = 'anonymous'
     audio.src = URL.createObjectURL(file)
     startAudio(audio)
-  }, [tick, setBands, setPlaying, setSource])
+  }, [tick, setPlaying, setSource])
 
   const connectUrl = useCallback((url: string, loop = true) => {
     cleanup()
@@ -85,7 +87,7 @@ export function useAudioAnalyser() {
     audio.loop = loop
     audio.src = url
     startAudio(audio)
-  }, [tick, setBands, setPlaying, setSource])
+  }, [tick, setPlaying, setSource])
 
   const connectMic = useCallback(async () => {
     cleanup()
@@ -114,9 +116,9 @@ export function useAudioAnalyser() {
       setPlaying(false)
       setPaused(true)
       cancelAnimationFrame(rafRef.current)
-      setBands(0, 0, 0)
+      audioBands.bass = audioBands.mids = audioBands.highs = 0
     }
-  }, [tick, setBands, setPlaying, setPaused])
+  }, [tick, setPlaying, setPaused])
 
   useEffect(() => {
     return () => {
