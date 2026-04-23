@@ -4,33 +4,123 @@ import { useAudioStore } from '../../stores/audioStore'
 
 const DEMO_TRACK = '/samples/lofi.mp3'
 
-const pill: React.CSSProperties = {
-  padding: '8px 20px',
-  border: '1px solid #ddd',
-  borderRadius: '24px',
+const glass: React.CSSProperties = {
+  width: 48,
+  height: 48,
+  borderRadius: '50%',
+  border: 'none',
   cursor: 'pointer',
-  background: 'white',
-  fontFamily: 'system-ui, sans-serif',
-  fontSize: '14px',
-  color: '#999',
-  transition: 'all 0.2s',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  background: 'rgba(255, 255, 255, 0.25)',
+  backdropFilter: 'blur(12px)',
+  WebkitBackdropFilter: 'blur(12px)',
+  boxShadow:
+    'inset 0 0 0 0.5px rgba(255,255,255,0.5), 0 4px 12px rgba(0,0,0,0.06)',
+  transition: 'all 0.25s ease',
+  color: 'rgba(0,0,0,0.35)',
 }
 
-const pillPrimary: React.CSSProperties = {
-  ...pill,
-  background: '#f0b0c8',
-  border: '1px solid #e8a0b4',
-  color: '#fff',
-  fontSize: '16px',
-  padding: '10px 28px',
+const glassHover = {
+  background: 'rgba(255, 255, 255, 0.4)',
+  boxShadow:
+    'inset 0 0 0 0.5px rgba(255,255,255,0.6), 0 6px 16px rgba(0,0,0,0.08)',
+}
+
+function GlassButton({
+  onClick,
+  children,
+  label,
+}: {
+  onClick?: () => void
+  children: React.ReactNode
+  label: string
+}) {
+  const [hovered, setHovered] = useState(false)
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      aria-label={label}
+      style={hovered ? { ...glass, ...glassHover } : glass}
+    >
+      {children}
+    </button>
+  )
+}
+
+function PlayIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <path d="M5 3.5L14.5 9L5 14.5V3.5Z" fill="currentColor" />
+    </svg>
+  )
+}
+
+function PauseIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <rect x="4" y="3" width="3.5" height="12" rx="1" fill="currentColor" />
+      <rect
+        x="10.5"
+        y="3"
+        width="3.5"
+        height="12"
+        rx="1"
+        fill="currentColor"
+      />
+    </svg>
+  )
+}
+
+function UploadIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <path
+        d="M9 3V12M9 3L5.5 6.5M9 3L12.5 6.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M3 13V14C3 14.5523 3.44772 15 4 15H14C14.5523 15 15 14.5523 15 14V13"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
+function MicIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <rect x="7" y="2" width="4" height="9" rx="2" fill="currentColor" />
+      <path
+        d="M4.5 9C4.5 11.4853 6.51472 13.5 9 13.5C11.4853 13.5 13.5 11.4853 13.5 9"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M9 13.5V16"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
 }
 
 export function AudioDropzone() {
   const [dragging, setDragging] = useState(false)
-  const { connectFile, connectUrl, connectMic, togglePause } = useAudioAnalyser()
+  const { connectFile, connectUrl, connectMic, togglePause } =
+    useAudioAnalyser()
   const isPlaying = useAudioStore((s) => s.isPlaying)
   const isPaused = useAudioStore((s) => s.isPaused)
-  const source = useAudioStore((s) => s.source)
 
   const onDragOver = useCallback((e: DragEvent) => {
     e.preventDefault()
@@ -65,7 +155,6 @@ export function AudioDropzone() {
 
   return (
     <>
-      {/* Drag overlay */}
       <div
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
@@ -97,7 +186,6 @@ export function AudioDropzone() {
         )}
       </div>
 
-      {/* Controls */}
       <div
         onDragOver={onDragOver}
         style={{
@@ -106,68 +194,41 @@ export function AudioDropzone() {
           left: '50%',
           transform: 'translateX(-50%)',
           display: 'flex',
-          gap: '12px',
+          gap: '10px',
           alignItems: 'center',
-          fontFamily: 'system-ui, sans-serif',
-          fontSize: '14px',
-          color: '#999',
           zIndex: 10,
         }}
       >
         {isPlaying ? (
-          <>
-            <button onClick={togglePause} style={pill}>
-              pause
-            </button>
-            <label style={pill}>
-              upload
-              <input
-                type="file"
-                accept="audio/*"
-                onChange={onFileSelect}
-                style={{ display: 'none' }}
-              />
-            </label>
-            <span style={{ fontSize: '12px', color: '#ccc' }}>
-              {source === 'mic' ? 'listening' : 'playing'}
-            </span>
-          </>
+          <GlassButton onClick={togglePause} label="Pause">
+            <PauseIcon />
+          </GlassButton>
         ) : isPaused ? (
-          <>
-            <button onClick={togglePause} style={pillPrimary}>
-              resume
-            </button>
-            <label style={pill}>
-              upload
-              <input
-                type="file"
-                accept="audio/*"
-                onChange={onFileSelect}
-                style={{ display: 'none' }}
-              />
-            </label>
-            <button onClick={connectMic} style={pill}>
-              mic
-            </button>
-          </>
+          <GlassButton onClick={togglePause} label="Resume">
+            <PlayIcon />
+          </GlassButton>
         ) : (
-          <>
-            <button onClick={playDemo} style={pillPrimary}>
-              play
-            </button>
-            <label style={pill}>
-              upload
-              <input
-                type="file"
-                accept="audio/*"
-                onChange={onFileSelect}
-                style={{ display: 'none' }}
-              />
-            </label>
-            <button onClick={connectMic} style={pill}>
-              mic
-            </button>
-          </>
+          <GlassButton onClick={playDemo} label="Play">
+            <PlayIcon />
+          </GlassButton>
+        )}
+
+        <label style={{ display: 'flex' }}>
+          <GlassButton label="Upload audio">
+            <UploadIcon />
+          </GlassButton>
+          <input
+            type="file"
+            accept="audio/*"
+            onChange={onFileSelect}
+            style={{ display: 'none' }}
+          />
+        </label>
+
+        {!isPlaying && !isPaused && (
+          <GlassButton onClick={connectMic} label="Microphone">
+            <MicIcon />
+          </GlassButton>
         )}
       </div>
     </>
