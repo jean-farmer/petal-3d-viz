@@ -9,4 +9,5 @@ html, body, #root {
   height: 100%;
   overflow: hidden;
   background: #e4e8f0;
+  cursor: none;
 }
