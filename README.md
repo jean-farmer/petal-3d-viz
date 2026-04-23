@@ -2,7 +2,7 @@
 
 An interactive 3D audio-reactive visualization built with React Three Fiber. Soft pastel orbs float in a physics simulation, gently responding to music and mouse interaction.
 
-<video src="assets/demo.mp4" autoplay loop muted playsinline width="100%"></video>
+![Petal demo](assets/demo.gif)
 
 ## Features
 
